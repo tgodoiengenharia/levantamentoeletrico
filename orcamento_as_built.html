@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projetos As Built — Pirapora/MG</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f6fb; min-height: 100vh; padding: 24px 16px; }
+  .container { max-width: 860px; margin: 0 auto; }
+  .header { margin-bottom: 24px; }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .badge { background: #1a6fa8; color: #fff; border-radius: 8px; padding: 6px 12px; font-weight: 800; font-size: 13px; letter-spacing: 1px; }
+  h1 { font-size: 20px; font-weight: 800; color: #1a3c5e; }
+  .subtitle { font-size: 13px; color: #667; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab-btn {
+    padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 14px; transition: all .2s;
+    background: #fff; color: #1a6fa8; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .tab-btn.active { background: #1a6fa8; color: #fff; box-shadow: 0 2px 8px rgba(26,111,168,0.25); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Checklist */
+  .progress-bar-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+  .progress-track { flex: 1; background: #e8f4f8; border-radius: 8px; height: 10px; }
+  .progress-fill { height: 10px; border-radius: 8px; background: #1a6fa8; transition: width .3s; width: 0%; }
+  .progress-label { font-weight: 700; color: #1a6fa8; font-size: 14px; white-space: nowrap; }
+  .cat-card { margin-bottom: 24px; background: #fff; border: 1px solid #dde8f0; border-radius: 10px; overflow: hidden; }
+  .cat-header { background: #1a6fa8; color: #fff; padding: 10px 16px; font-weight: 700; font-size: 15px; display: flex; gap: 8px; align-items: center; }
+  .cat-items { padding: 8px 0; }
+  .check-label {
+    display: flex; align-items: flex-start; gap: 10; padding: 7px 16px;
+    cursor: pointer; transition: background .15s; gap: 10px;
+  }
+  .check-label:hover { background: #f5fbff; }
+  .check-label.done { background: #f0f9ff; }
+  .check-label input[type=checkbox] { margin-top: 3px; accent-color: #1a6fa8; width: 16px; height: 16px; flex-shrink: 0; }
+  .check-text { font-size: 14px; color: #2c3e50; }
+  .check-label.done .check-text { color: #999; text-decoration: line-through; }
+
+  /* Orçamento */
+  .global-params { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .param-card { background: #fff; border: 1px solid #dde8f0; border-radius: 10px; padding: 14px; }
+  .param-label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
+  input[type=number], select {
+    width: 100%; padding: 7px 10px; border: 1px solid #cdd8e3;
+    border-radius: 6px; font-size: 14px; outline: none;
+    background: #f8fbfd; font-family: inherit;
+  }
+  input[type=number]:focus, select:focus { border-color: #1a6fa8; }
+  .local-card { margin-bottom: 16px; background: #fff; border: 1.5px solid #1a6fa8; border-radius: 10px; overflow: hidden; transition: opacity .2s; }
+  .local-card.disabled { opacity: 0.55; border-color: #ddd; }
+  .local-header {
+    background: #1a6fa8; color: #fff; padding: 9px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .local-card.disabled .local-header { background: #aaa; }
+  .local-nome { font-weight: 700; font-size: 14px; }
+  .local-incluir { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .local-incluir input { accent-color: #fff; }
+  .local-body { padding: 12px 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .field-label { font-size: 12px; color: #555; display: block; margin-bottom: 4px; font-weight: 600; }
+  .flags { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+  .flag-label { display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; }
+  .flag-label input { accent-color: #1a6fa8; }
+  .subtotal-row {
+    grid-column: 1 / -1; background: #f0f9ff; border-radius: 8px;
+    padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .subtotal-label { font-size: 13px; color: #555; }
+  .subtotal-value { font-weight: 700; color: #1a6fa8; font-size: 16px; }
+  .total-box {
+    background: #1a6fa8; color: #fff; border-radius: 12px;
+    padding: 18px 20px; margin-top: 24px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .total-sem { font-size: 13px; opacity: .85; }
+  .total-sem-val { font-size: 22px; font-weight: 700; }
+  .total-final { text-align: right; }
+  .total-final-label { font-size: 13px; opacity: .85; }
+  .total-final-val { font-size: 26px; font-weight: 800; }
+  .total-info { grid-column: 1/-1; font-size: 12px; opacity: .7; }
+
+  @media (max-width: 600px) {
+    .global-params { grid-template-columns: 1fr; }
+    .local-body { grid-template-columns: 1fr 1fr; }
+    .total-box { grid-template-columns: 1fr; }
+    .total-final { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-top">
+      <div class="badge">ELÉTRICO</div>
+      <h1>Projetos As Built — Pirapora/MG</h1>
+    </div>
+    <p class="subtitle">Checklist de levantamento de campo + Calculadora de orçamento</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('checklist')">✅ Checklist de Campo</button>
+    <button class="tab-btn" onclick="switchTab('orcamento')">💰 Calculadora de Orçamento</button>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div id="tab-checklist" class="tab-content active">
+    <div class="progress-bar-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span class="progress-label" id="progress-label">0/0 itens</span>
+    </div>
+    <div id="checklist-cards"></div>
+  </div>
+
+  <!-- ORÇAMENTO -->
+  <div id="tab-orcamento" class="tab-content">
+    <div class="global-params">
+      <div class="param-card">
+        <label class="param-label">Taxa Hora Técnico (R$)</label>
+        <input type="number" id="taxaHora" value="180" oninput="calcAll()">
+      </div>
+      <div class="param-card">
+        <label class="param-label">Taxa por KM (R$)</label>
+        <input type="number" id="taxaKm" value="1.5" step="0.1" oninput="calcAll()">
+      </div>
+      <div class="param-card">
+        <label class="param-label">Margem / BDI (%)</label>
+        <input type="number" id="margem" value="15" oninput="calcAll()">
+      </div>
+    </div>
+    <div id="locais-cards"></div>
+    <div class="total-box">
+      <div>
+        <div class="total-sem">Subtotal (sem margem)</div>
+        <div class="total-sem-val" id="totalSem">R$ 0,00</div>
+      </div>
+      <div class="total-final">
+        <div class="total-final-label" id="totalFinalLabel">Total Final (com 15% BDI)</div>
+        <div class="total-final-val" id="totalFinal">R$ 0,00</div>
+      </div>
+      <div class="total-info" id="totalInfo">Locais incluídos: 11 de 11</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const checklistData = [
+  { categoria: "Quadro de Distribuição", icon: "⚡", itens: [
+    "Tipo e modelo do quadro (aparente / embutido)",
+    "Número de circuitos existentes",
+    "Capacidade total do disjuntor geral (A)",
+    "Marca e capacidade dos disjuntores individuais",
+    "Estado de conservação do quadro",
+    "Existência de barramento de neutro e terra separados",
+    "Identificação/etiquetagem dos circuitos",
+    "Presença de DR (Diferencial Residual) ou DPS (Dispositivo de Proteção contra Surtos)",
+  ]},
+  { categoria: "Fiação e Cabeamento", icon: "🔌", itens: [
+    "Bitola dos condutores por circuito (mm²)",
+    "Tipo de cabo (flexível, rígido, PP, etc.)",
+    "Estado de conservação da fiação (deterioração, emendas expostas)",
+    "Tipo de eletroduto (PVC, aço, condulete) e estado",
+    "Passagem de fios sem proteção / sem eletroduto",
+    "Existência de fiação aparente não prevista",
+    "Número aproximado de pontos de tomada por ambiente",
+    "Número aproximado de pontos de iluminação por ambiente",
+  ]},
+  { categoria: "Cargas e Equipamentos", icon: "🏭", itens: [
+    "Levantamento de todos os equipamentos instalados (bombas, compressores, etc.)",
+    "Potência de cada equipamento (kW / CV)",
+    "Tensão de operação (127V / 220V / 380V trifásico)",
+    "Existência de motores elétricos — quantidade e potência",
+    "Presença de gerador — potência e tipo de partida",
+    "Condicionadores de ar — quantidade, modelo e BTUs",
+    "Carga instalada total estimada (kVA)",
+    "Existência de banco de capacitores (correção de fator de potência)",
+  ]},
+  { categoria: "Entrada de Energia e Medição", icon: "🔋", itens: [
+    "Tipo de fornecimento (monofásico / bifásico / trifásico)",
+    "Tensão de fornecimento da concessionária",
+    "Localização e tipo do medidor",
+    "Existência de transformador próprio (trafo) — potência e relação",
+    "Demanda contratada junto à concessionária",
+    "Existência de SPDA (para-raios)",
+    "Condição do aterramento (haste, barramento)",
+  ]},
+  { categoria: "Iluminação", icon: "💡", itens: [
+    "Tipo de lâmpadas (LED, vapor metálico, fluorescente, etc.)",
+    "Potência das luminárias instaladas",
+    "Número total de pontos de iluminação",
+    "Presença de iluminação de emergência",
+    "Existência de sensores de presença ou automação",
+  ]},
+  { categoria: "Dimensões e Complexidade da Área", icon: "📐", itens: [
+    "Área total construída aproximada (m²)",
+    "Número de pavimentos / ambientes distintos",
+    "Tipo de edificação (galpão, sala de controle, casa de bombas, área externa)",
+    "Dificuldade de acesso (área rural, confinada, altura)",
+    "Existência de planta baixa ou documentação existente",
+    "Quantidade de circuitos a levantar/desenhar",
+    "Necessidade de medições e testes in loco",
+    "Estimativa de deslocamento / logística de acesso",
+  ]},
+  { categoria: "Documentação e Normas", icon: "📋", itens: [
+    "Existência de projeto elétrico anterior (mesmo que desatualizado)",
+    "Existência de ART/RRT anterior",
+    "Necessidade de laudo de conformidade (NR-10, ABNT NBR 5410)",
+    "Quantidade de pranchas estimadas para o projeto As Built",
+    "Necessidade de memorial descritivo e lista de materiais",
+  ]},
+];
+
+const locaisData = [
+  { id: 1, nome: "Estação de Tratamento de Água I (ETA I)", endereco: "Av. Salmeron, 255, Centro, Pirapora/MG" },
+  { id: 2, nome: "Captação de Água (ETA I)", endereco: "Av. Beira Rio, 722, Bom Jesus, Pirapora/MG" },
+  { id: 3, nome: "Estação Tratamento de Água II (ETA II)", endereco: "Av. Dr. José Patrus de Souza, 08, Dist. Industrial" },
+  { id: 4, nome: "Captação de Água I (ETA II)", endereco: "Av. Kenzo Miyawaki, 815, Distrito Industrial" },
+  { id: 5, nome: "Reservatório Nova Pirapora", endereco: "Av. Herculano Cintra Mourão, 2155, Nova Pirapora" },
+  { id: 6, nome: "Estação de Tratamento de Esgoto (ETE)", endereco: "Zona Rural Pernambuco, Pirapora/MG" },
+  { id: 7, nome: "Est. Elevatória Inicial de Esgoto (EEEI) Aparecida", endereco: "Rua Sete Lagoas, 77, N. S. Aparecida" },
+  { id: 8, nome: "Est. Elevatória de Esgoto (EEESF) São Francisco", endereco: "Rua Dez, 1, São Francisco / São Geraldo" },
+  { id: 9, nome: "Est. Elevatória de Esgoto (EEES) Shekinah", endereco: "Rua Esmeralda, 98, Shekinah / São Geraldo" },
+  { id: 10, nome: "Est. Elevatória de Esgoto II (EEE II) Bom Jesus", endereco: "Rua Silva Jardim, 452, Bom Jesus I" },
+  { id: 11, nome: "Est. Elevatória de Esgoto Alphaville", endereco: "Rua G, 447, Alphaville, Pirapora/MG" },
+];
+
+const complexMult = { Baixa: 1.0, Média: 1.4, Alta: 1.8 };
+let checked = {};
+let totalItems = 0;
+
+// Build checklist
+function buildChecklist() {
+  const container = document.getElementById('checklist-cards');
+  totalItems = 0;
+  checklistData.forEach((cat, ci) => {
+    totalItems += cat.itens.length;
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.innerHTML = `<div class="cat-header"><span>${cat.icon}</span> ${cat.categoria}</div><div class="cat-items" id="cat-${ci}"></div>`;
+    container.appendChild(card);
+    const itemsDiv = card.querySelector(`#cat-${ci}`);
+    cat.itens.forEach((item, ii) => {
+      const key = `${ci}-${ii}`;
+      const lbl = document.createElement('label');
+      lbl.className = 'check-label';
+      lbl.dataset.key = key;
+      lbl.innerHTML = `<input type="checkbox" onchange="toggleCheck('${key}', this)"><span class="check-text">${item}</span>`;
+      itemsDiv.appendChild(lbl);
+    });
+  });
+  updateProgress();
+}
+
+function toggleCheck(key, cb) {
+  checked[key] = cb.checked;
+  const lbl = document.querySelector(`[data-key="${key}"]`);
+  if (lbl) lbl.classList.toggle('done', cb.checked);
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(checked).filter(Boolean).length;
+  document.getElementById('progress-fill').style.width = `${(done / totalItems) * 100}%`;
+  document.getElementById('progress-label').textContent = `${done}/${totalItems} itens`;
+}
+
+// Build locais
+function buildLocais() {
+  const container = document.getElementById('locais-cards');
+  locaisData.forEach(l => {
+    const card = document.createElement('div');
+    card.className = 'local-card';
+    card.id = `local-card-${l.id}`;
+    card.innerHTML = `
+      <div class="local-header">
+        <span class="local-nome">${l.nome}</span>
+        <label class="local-incluir">
+          <input type="checkbox" checked onchange="toggleLocal(${l.id}, this)"> Incluir
+        </label>
+      </div>
+      <div class="local-body" id="local-body-${l.id}">
+        <div>
+          <label class="field-label">Área (m²)</label>
+          <input type="number" id="area-${l.id}" placeholder="ex: 120" oninput="calcAll()">
+        </div>
+        <div>
+          <label class="field-label">Nº de Circuitos</label>
+          <input type="number" id="circ-${l.id}" placeholder="ex: 8" oninput="calcAll()">
+        </div>
+        <div>
+          <label class="field-label">Complexidade</label>
+          <select id="comp-${l.id}" onchange="calcAll()">
+            <option>Baixa</option>
+            <option selected>Média</option>
+            <option>Alta</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Distância ida (km)</label>
+          <input type="number" id="km-${l.id}" placeholder="km" value="0" oninput="calcAll()">
+        </div>
+        <div>
+          <label class="field-label">Horas extras estimadas</label>
+          <input type="number" id="hex-${l.id}" placeholder="h" value="0" oninput="calcAll()">
+        </div>
+        <div class="flags">
+          <label class="flag-label"><input type="checkbox" id="gen-${l.id}" onchange="calcAll()"> Tem Gerador</label>
+          <label class="flag-label"><input type="checkbox" id="trf-${l.id}" onchange="calcAll()"> Tem Trafo</label>
+        </div>
+        <div class="subtotal-row">
+          <span class="subtotal-label">Subtotal deste local</span>
+          <span class="subtotal-value" id="sub-${l.id}">R$ 0,00</span>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+  calcAll();
+}
+
+function toggleLocal(id, cb) {
+  const card = document.getElementById(`local-card-${id}`);
+  const body = document.getElementById(`local-body-${id}`);
+  card.classList.toggle('disabled', !cb.checked);
+  body.style.display = cb.checked ? 'grid' : 'none';
+  calcAll();
+}
+
+function getVal(id) { const el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
+function getStr(id) { const el = document.getElementById(id); return el ? el.value : 'Média'; }
+function getBool(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+
+function calcLocal(lid) {
+  const card = document.getElementById(`local-card-${lid}`);
+  if (card && card.classList.contains('disabled')) return 0;
+  const area = getVal(`area-${lid}`);
+  const circ = getVal(`circ-${lid}`);
+  const comp = complexMult[getStr(`comp-${lid}`)] || 1.4;
+  const km = getVal(`km-${lid}`);
+  const hex = getVal(`hex-${lid}`);
+  const gen = getBool(`gen-${lid}`);
+  const trf = getBool(`trf-${lid}`);
+  const taxaHora = getVal('taxaHora') || 180;
+  const taxaKm = getVal('taxaKm') || 1.5;
+  const horasBase = Math.max(4, (area / 80) * 3 + circ * 0.5);
+  const horasTotal = (horasBase + hex) * comp;
+  const custoHoras = horasTotal * taxaHora;
+  const custoKm = km * 2 * taxaKm;
+  const adicional = (gen ? 350 : 0) + (trf ? 280 : 0);
+  return custoHoras + custoKm + adicional;
+}
+
+function calcAll() {
+  let subtotal = 0;
+  let incluidos = 0;
+  locaisData.forEach(l => {
+    const val = calcLocal(l.id);
+    const card = document.getElementById(`local-card-${l.id}`);
+    const disabled = card && card.classList.contains('disabled');
+    if (!disabled) { subtotal += val; incluidos++; }
+    const sub = document.getElementById(`sub-${l.id}`);
+    if (sub) sub.textContent = val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  });
+  const margem = getVal('margem') || 15;
+  const totalFinal = subtotal * (1 + margem / 100);
+  document.getElementById('totalSem').textContent = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById('totalFinal').textContent = totalFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  document.getElementById('totalFinalLabel').textContent = `Total Final (com ${margem}% BDI)`;
+  document.getElementById('totalInfo').textContent = `Locais incluídos: ${incluidos} de ${locaisData.length}`;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.getAttribute('onclick').includes(tab)) btn.classList.add('active');
+  });
+}
+
+buildChecklist();
+buildLocais();
+</script>
+</body>
+</html>
